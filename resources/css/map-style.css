@@ -152,29 +152,21 @@ body {
 }
 
 /* Override for fullscreen - allows expansion */
-.wt-fullscreen-container:fullscreen .time-map-container,
-.wt-fullscreen-container:-webkit-full-screen .time-map-container,
-.wt-fullscreen-container:-moz-full-screen .time-map-container,
-.wt-fullscreen-container:-ms-fullscreen .time-map-container {
+/* Override for fullscreen - allows expansion */
+.wt-fullscreen-container.is-fullscreen .time-map-container {
     height: auto !important;
     min-height: 0 !important;
     flex: 1 1 0% !important;
     border: none;
 }
 
-.wt-fullscreen-container:fullscreen #map,
-.wt-fullscreen-container:-webkit-full-screen #map,
-.wt-fullscreen-container:-moz-full-screen #map,
-.wt-fullscreen-container:-ms-fullscreen #map {
+.wt-fullscreen-container.is-fullscreen #map {
     flex: 1 1 auto;
     height: auto !important;
 }
 
 /* Fullscreen Active State adjustments - Enforce Flexbox */
-.wt-fullscreen-container:fullscreen,
-.wt-fullscreen-container:-webkit-full-screen,
-.wt-fullscreen-container:-moz-full-screen,
-.wt-fullscreen-container:-ms-fullscreen {
+.wt-fullscreen-container.is-fullscreen {
     display: flex !important;
     flex-direction: column !important;
     background: white !important;
@@ -183,6 +175,10 @@ body {
     padding: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
+    position: fixed !important; /* Ensure it floats above everything */
+    top: 0;
+    left: 0;
+    z-index: 99999;
 }
 
 

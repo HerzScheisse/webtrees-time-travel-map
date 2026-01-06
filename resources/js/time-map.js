@@ -71,6 +71,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
         document.addEventListener(evt, function () {
+            const wrapper = document.getElementById('time-travel-wrapper');
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+                if (wrapper) wrapper.classList.add('is-fullscreen');
+            } else {
+                if (wrapper) wrapper.classList.remove('is-fullscreen');
+            }
+
             // Check immediately and repeatedly for a short duration
             checkMapSize();
             setTimeout(checkMapSize, 100);
