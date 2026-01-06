@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let individuals = [];
     let visibleMarkers = {}; // Map of id -> L.marker
+    let displacementLines = {}; // Map of id -> L.polyline
     let parentLines = []; // Array of L.polyline
     let heatmapLayer = null;
     let isPlaying = false;
@@ -248,68 +249,150 @@ document.addEventListener('DOMContentLoaded', function () {
         return { lat: bestEvent.coords[0], lng: bestEvent.coords[1], event: bestEvent };
     }
 
+    function getDisplacedCoords(centerLat, centerLng, index) {
+        // Increase distance as more people are added (Spiral)
+        const goldenAngle = 137.508; // Degrees
+        const distanceStep = 0.002; // Roughly 200 meters per person
+
+        const radius = distanceStep * Math.sqrt(index + 1);
+        const angle = index * goldenAngle;
+
+        const newLat = centerLat + (radius * Math.cos(angle * Math.PI / 180));
+        const newLng = centerLng + (radius * Math.sin(angle * Math.PI / 180));
+
+        return { lat: newLat, lng: newLng };
+    }
+
     function updateMap(year) {
-        // 1. Update/Add/Remove Markers
-        const activePeople = [];
-        const activeCoords = [];
+        // 1. Identify Valid People & Locations
+        const currentActive = []; // { person, pos: {lat, lng, event} }
+        const coordsMap = {}; // "lat,lng" -> [ {person, pos} ]
 
         individuals.forEach(person => {
             const birth = person.yearFrom || -9999;
             const death = person.yearTo || 9999;
 
-            if (year < birth || year > death) {
-                if (visibleMarkers[person.id]) {
-                    map.removeLayer(visibleMarkers[person.id]);
-                    delete visibleMarkers[person.id];
-                }
-                return;
-            }
+            if (year < birth || year > death) return;
 
             const pos = getPositionAtYear(person, year);
-            if (!pos) {
-                if (visibleMarkers[person.id]) {
-                    map.removeLayer(visibleMarkers[person.id]);
-                    delete visibleMarkers[person.id];
-                }
-                return;
+            if (!pos) return;
+
+            const wrapper = { person, pos };
+            currentActive.push(wrapper);
+
+            const key = `${pos.lat.toFixed(6)},${pos.lng.toFixed(6)}`;
+            if (!coordsMap[key]) coordsMap[key] = [];
+            coordsMap[key].push(wrapper);
+        });
+
+        // 2. Calculate Final Positions (Handling Clusters)
+        const finalPositions = {}; // personId -> { lat, lng, isDisplaced, origin: {lat,lng} }
+
+        Object.keys(coordsMap).forEach(key => {
+            const cluster = coordsMap[key];
+            if (cluster.length === 1) {
+                const p = cluster[0];
+                finalPositions[p.person.id] = {
+                    lat: p.pos.lat,
+                    lng: p.pos.lng,
+                    isDisplaced: false
+                };
+            } else {
+                // Cluster
+                const originLat = cluster[0].pos.lat;
+                const originLng = cluster[0].pos.lng;
+
+                // Sort cluster by ID for stability
+                cluster.sort((a, b) => a.person.id.localeCompare(b.person.id));
+
+                cluster.forEach((item, index) => {
+                    const displaced = getDisplacedCoords(originLat, originLng, index);
+                    finalPositions[item.person.id] = {
+                        lat: displaced.lat,
+                        lng: displaced.lng,
+                        isDisplaced: true,
+                        origin: { lat: originLat, lng: originLng }
+                    };
+                });
             }
+        });
 
-            activePeople.push({ person, pos });
-            activeCoords.push([pos.lat, pos.lng]);
+        // 3. Update Markers & Lines
+        const activeIds = new Set(currentActive.map(i => i.person.id));
+        const activeCoords = [];
 
+        // Remove old markers/lines
+        Object.keys(visibleMarkers).forEach(id => {
+            if (!activeIds.has(id)) {
+                map.removeLayer(visibleMarkers[id]);
+                delete visibleMarkers[id];
+                if (displacementLines[id]) {
+                    map.removeLayer(displacementLines[id]);
+                    delete displacementLines[id];
+                }
+            }
+        });
+
+        // Update/Create new
+        currentActive.forEach(item => {
+            const person = item.person;
+            const target = finalPositions[person.id];
+            activeCoords.push([target.lat, target.lng]);
+
+            // Marker
+            const newLatLng = new L.LatLng(target.lat, target.lng);
             if (visibleMarkers[person.id]) {
                 const marker = visibleMarkers[person.id];
                 const oldLatLng = marker.getLatLng();
-                const newLatLng = new L.LatLng(pos.lat, pos.lng);
-
-                if (oldLatLng.distanceTo(newLatLng) > 10) {
+                if (oldLatLng.distanceTo(newLatLng) > 1) {
                     marker.setLatLng(newLatLng);
                 }
             } else {
-                const marker = L.marker([pos.lat, pos.lng], {
+                const marker = L.marker(newLatLng, {
                     icon: createCalloutIcon(person)
                 });
-
                 marker.on('click', () => {
                     const content = buildPopupContent(person);
                     marker.bindPopup(content, { maxWidth: 350, minWidth: 250 }).openPopup();
                 });
-
                 marker.addTo(map);
                 visibleMarkers[person.id] = marker;
             }
+
+            // Displacement Line
+            if (target.isDisplaced) {
+                const origin = target.origin;
+                const linePoints = [[origin.lat, origin.lng], [target.lat, target.lng]];
+
+                if (displacementLines[person.id]) {
+                    displacementLines[person.id].setLatLngs(linePoints);
+                } else {
+                    const line = L.polyline(linePoints, {
+                        color: '#666',
+                        weight: 1,
+                        opacity: 0.6
+                    }).addTo(map);
+                    displacementLines[person.id] = line;
+                }
+            } else {
+                // Remove line if exists (no longer displaced)
+                if (displacementLines[person.id]) {
+                    map.removeLayer(displacementLines[person.id]);
+                    delete displacementLines[person.id];
+                }
+            }
         });
 
-        // 2. Handle Parent Lines
+        // 4. Handle Parent Lines
         if (parentsCheck && parentsCheck.checked) {
-            drawParentLines(activePeople);
+            drawParentLines(currentActive, finalPositions);
         } else {
             clearParentLines();
         }
 
-        // 3. Handle Heatmap
+        // 5. Handle Heatmap
         if (heatmapCheck && heatmapCheck.checked) {
-            drawHeatmap(activePeople);
+            drawHeatmap(currentActive);
         } else {
             if (heatmapLayer) {
                 map.removeLayer(heatmapLayer);
@@ -317,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // 4. Handle Autozoom
+        // 6. Handle Autozoom
         if (autozoomCheck && autozoomCheck.checked) {
             if (activeCoords.length > 0) {
                 const bounds = L.latLngBounds(activeCoords);
@@ -371,15 +454,16 @@ document.addEventListener('DOMContentLoaded', function () {
         parentLines = [];
     }
 
-    function drawParentLines(activePeople) {
+    function drawParentLines(activePeople, finalPositions) {
         clearParentLines();
 
-        const activePos = {};
-        activePeople.forEach(ap => activePos[ap.person.id] = ap.pos);
+        const activePos = finalPositions;
 
         activePeople.forEach(ap => {
             const p = ap.person;
-            const from = ap.pos;
+            const from = activePos[p.id];
+
+            if (!from) return;
 
             if (p.father && activePos[p.father]) {
                 const to = activePos[p.father];
