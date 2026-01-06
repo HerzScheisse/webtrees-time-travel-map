@@ -249,16 +249,23 @@ document.addEventListener('DOMContentLoaded', function () {
         return { lat: bestEvent.coords[0], lng: bestEvent.coords[1], event: bestEvent };
     }
 
-    function getDisplacedCoords(centerLat, centerLng, index) {
-        // Increase distance as more people are added (Spiral)
-        const goldenAngle = 137.508; // Degrees
-        const distanceStep = 0.002; // Roughly 200 meters per person
+    function getDisplacedCoords(centerLat, centerLng, index, total) {
+        if (total <= 1) return { lat: centerLat, lng: centerLng };
 
-        const radius = distanceStep * Math.sqrt(index + 1);
-        const angle = index * goldenAngle;
+        // Radius: Start with base 0.02 (~2km) and grow if needed
+        const radius = Math.max(0.02, total * 0.003);
 
-        const newLat = centerLat + (radius * Math.cos(angle * Math.PI / 180));
-        const newLng = centerLng + (radius * Math.sin(angle * Math.PI / 180));
+        // Distribute evenly around the circle
+        const angleStep = 360 / total;
+        const angleDeg = (index * angleStep) - 90; // Start at top (-90 degrees)
+        const angleRad = angleDeg * (Math.PI / 180);
+
+        // Aspect ratio correction for latitude
+        const latRad = centerLat * (Math.PI / 180);
+        const lngScale = 1 / Math.cos(latRad);
+
+        const newLat = centerLat + radius * Math.sin(angleRad);
+        const newLng = centerLng + (radius * Math.cos(angleRad)) * lngScale;
 
         return { lat: newLat, lng: newLng };
     }
@@ -287,26 +294,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 2. Calculate Final Positions (Handling Clusters)
         const finalPositions = {}; // personId -> { lat, lng, isDisplaced, origin: {lat,lng} }
+        const nextClusterState = {};
 
         Object.keys(coordsMap).forEach(key => {
             const cluster = coordsMap[key];
+            const originLat = cluster[0].pos.lat;
+            const originLng = cluster[0].pos.lng;
+
             if (cluster.length === 1) {
+                // Special case: Single person. 
+                // However, to maintain stability if they were previously part of a cluster, 
+                // we should check if we want to reset reset them or keep spiraling.
+                // But usually 1 person = center. 
+                // Let's reset to center if alone.
                 const p = cluster[0];
                 finalPositions[p.person.id] = {
-                    lat: p.pos.lat,
-                    lng: p.pos.lng,
+                    lat: originLat,
+                    lng: originLng,
                     isDisplaced: false
                 };
+
+                // Clear state for this key (will start fresh next time)
+                // Actually, if a 2nd person comes, we want this person to stay 0?
+                // Yes. So assign index 0.
+                nextClusterState[key] = {};
+                nextClusterState[key][p.person.id] = 0;
             } else {
                 // Cluster
-                const originLat = cluster[0].pos.lat;
-                const originLng = cluster[0].pos.lng;
-
-                // Sort cluster by ID for stability
-                cluster.sort((a, b) => a.person.id.localeCompare(b.person.id));
+                const activePeople = cluster.map(c => c.person);
+                // Cluster: Sort by YearFrom to stabilize order
+                cluster.sort((a, b) => {
+                    const yA = parseInt(a.person.yearFrom) || 0;
+                    const yB = parseInt(b.person.yearFrom) || 0;
+                    if (yA !== yB) return yA - yB;
+                    return a.person.id.localeCompare(b.person.id);
+                });
 
                 cluster.forEach((item, index) => {
-                    const displaced = getDisplacedCoords(originLat, originLng, index);
+                    // Pass total count for circle calculation
+                    const displaced = getDisplacedCoords(originLat, originLng, index, cluster.length);
                     finalPositions[item.person.id] = {
                         lat: displaced.lat,
                         lng: displaced.lng,
@@ -316,6 +342,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
         });
+
+
 
         // 3. Update Markers & Lines
         const activeIds = new Set(currentActive.map(i => i.person.id));
