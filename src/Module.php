@@ -83,7 +83,7 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
      */
     public function customModuleSupportUrl(): string
     {
-        return '';
+        return 'https://github.com/gmarcon/webtrees-time-travel-map';
     }
 
     /**
