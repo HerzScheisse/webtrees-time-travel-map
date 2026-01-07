@@ -53,14 +53,6 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
     /**
      * @return string
      */
-    public function customModuleImage(): string
-    {
-        return '';
-    }
-
-    /**
-     * @return string
-     */
     public function customModuleAuthorName(): string
     {
         return 'Giulio Marcon';
