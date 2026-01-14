@@ -86,7 +86,7 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
      */
     public function customModuleSupportUrl(): string
     {
-        return return self::CUSTOM_SUPPORT_URL;
+        return self::CUSTOM_SUPPORT_URL;
     }
 
     /**
