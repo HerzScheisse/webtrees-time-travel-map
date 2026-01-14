@@ -33,6 +33,11 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
 
     public const DEFAULT_INDI_TAGS = ['BIRT', 'CHR', 'BAPM', 'DEAT', 'BURI', 'CREM', 'RESI', 'EDUC', 'OCCU', 'CENS', 'EVEN'];
     public const DEFAULT_FAM_TAGS = ['MARR', 'DIV', 'CENS', 'RESI', 'EVEN'];
+
+    public const CUSTOM_VERSION = '1.0.5';
+    public const CUSTOM_AUTHOR = 'Giulio Marcon';
+    public const GITHUB_REPO = 'gmarcon/webtrees-time-travel-map';
+
     /**
      * @return string
      */
@@ -54,7 +59,7 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
      */
     public function customModuleAuthorName(): string
     {
-        return 'Giulio Marcon';
+        return self::CUSTOM_AUTHOR;
     }
 
     /**
@@ -62,7 +67,7 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
      */
     public function customModuleVersion(): string
     {
-        return '1.0.5';
+        return self::CUSTOM_VERSION;
     }
 
     /**
@@ -70,7 +75,7 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
      */
     public function customModuleLatestVersionUrl(): string
     {
-        return 'https://raw.githubusercontent.com/gmarcon/webtrees-time-travel-map/refs/heads/main/latest-version.txt';
+        return 'https://raw.githubusercontent.com/' . self::GITHUB_REPO . '/main/latest-version.txt';
     }
 
     /**
@@ -78,7 +83,7 @@ class Module extends AbstractModule implements ModuleCustomInterface, ModuleChar
      */
     public function customModuleSupportUrl(): string
     {
-        return 'https://github.com/gmarcon/webtrees-time-travel-map';
+        return 'https://github.com/' . self::GITHUB_REPO;
     }
 
     /**
