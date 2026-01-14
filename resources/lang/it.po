@@ -1,0 +1,143 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Time Travel Map\n"
+"POT-Creation-Date: 2026-01-14 05:00+0100\n"
+"PO-Revision-Date: 2026-01-14 09:17+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.8\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: translate;noop;plural:1,2\n"
+"X-Poedit-Flags-xgettext: --add-comments\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: .git\n"
+"X-Poedit-SearchPathExcluded-1: dist\n"
+"X-Poedit-SearchPathExcluded-2: node_modules\n"
+
+#: src/Http/MapPage.php:60 src/Module.php:47
+msgid "Time Travel Map"
+msgstr "Viaggio nello spazio-tempo"
+
+#: src/Module.php:55
+msgid "Time Travel Map is a module to visualize the geographic history of a family over time."
+msgstr "Viaggio nello spazio-tempo è un modulo per visualizzare la storia geografica di una famiglia nel tempo."
+
+#: src/Module.php:261
+#, php-format
+msgid "The preferences for the module “%s” have been updated."
+msgstr "Le preferenze per il modulo “%s” sono state aggiornate."
+
+#: src/Services/TreeWalker.php:78
+msgid "Estimated Location"
+msgstr "Posizione stimata"
+
+#. *
+#. * @var string $data_url
+#. * @var string $direction
+#. * @var string $tree_name
+#. * @var string $xref
+#. * @var object $leaflet_config
+#.
+#: views/chart.phtml:21
+msgid "Please select a starting individual and click \"view\" to begin."
+msgstr "Seleziona un individuo di partenza e clicca su \"vedi\" per iniziare."
+
+#: views/chart.phtml:33
+msgid "Loading data..."
+msgstr "Caricamento dati..."
+
+#: views/chart.phtml:45
+msgid "Autozoom"
+msgstr "Zoom automatico"
+
+#: views/chart.phtml:51
+msgid "Show Parents Lines"
+msgstr "Mostra collegamenti genitori"
+
+#: views/chart.phtml:57
+msgid "Show Callouts"
+msgstr "Mostra didascalie"
+
+#: views/chart.phtml:71
+msgid "Reverse"
+msgstr "Riproduci al contrario"
+
+#: views/chart.phtml:73
+msgid "Pause"
+msgstr "Pausa"
+
+#: views/chart.phtml:75
+msgid "Play"
+msgstr "Riproduci"
+
+#. *
+#. * @var array<string> $indi_tags
+#. * @var array<string> $fam_tags
+#. * @var string        $title
+#. * @var string        $module
+#.
+#: views/config.phtml:17
+msgid "Control panel"
+msgstr "Pannello di controllo"
+
+#: views/config.phtml:17
+msgid "Modules"
+msgstr "Moduli"
+
+#: views/config.phtml:25
+msgid "Individual events"
+msgstr "Eventi individuali"
+
+#: views/config.phtml:34
+msgid "Family events"
+msgstr "Eventi familiari"
+
+#: views/config.phtml:44
+msgid "Save"
+msgstr "Salva"
+
+#: views/config.phtml:49
+msgid "Cancel"
+msgstr "Annulla"
+
+#. *
+#. * @var Individual|null $individual
+#. * @var string          $map
+#. * @var string          $title
+#. * @var Tree            $tree
+#. * @var string          $direction
+#.
+#: views/page.phtml:28
+msgid "Individual"
+msgstr "Individuo"
+
+#: views/page.phtml:37
+msgid "Mode"
+msgstr "Modalità"
+
+#: views/page.phtml:42
+msgid "Ancestors (Backward in Time)"
+msgstr "Antenati (Indietro nel tempo)"
+
+#: views/page.phtml:45
+msgid "Descendants (Forward in Time)"
+msgstr "Discendenti (Avanti nel tempo)"
+
+#: views/page.phtml:53
+msgid "Generations"
+msgstr "Generazioni"
+
+#: views/page.phtml:63
+msgid "All"
+msgstr "Tutti"
+
+#: views/page.phtml:72
+msgid "View"
+msgstr "Vedi"
