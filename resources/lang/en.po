@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Time Travel Map\n"
-"POT-Creation-Date: 2026-01-14 04:31+0100\n"
-"PO-Revision-Date: 2026-01-14 04:32+0100\n"
+"POT-Creation-Date: 2026-01-14 05:00+0100\n"
+"PO-Revision-Date: 2026-01-14 05:00+0100\n"
 "Last-Translator: Holger Eisold <github@eisold.family>\n"
 "Language-Team: \n"
 "Language: en\n"
@@ -21,15 +21,15 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-1: dist\n"
 "X-Poedit-SearchPathExcluded-2: node_modules\n"
 
-#: src/Http/MapPage.php:60 src/Module.php:46
+#: src/Http/MapPage.php:60 src/Module.php:47
 msgid "Time Travel Map"
 msgstr ""
 
-#: src/Module.php:54
+#: src/Module.php:55
 msgid "Time Travel Map is a module to visualize the geographic history of a family over time."
 msgstr ""
 
-#: src/Module.php:269
+#: src/Module.php:261
 #, php-format
 msgid "The preferences for the module “%s” have been updated."
 msgstr ""
@@ -47,6 +47,10 @@ msgstr ""
 #.
 #: views/chart.phtml:21
 msgid "Please select a starting individual and click \"view\" to begin."
+msgstr ""
+
+#: views/chart.phtml:33
+msgid "Loading data..."
 msgstr ""
 
 #: views/chart.phtml:45
